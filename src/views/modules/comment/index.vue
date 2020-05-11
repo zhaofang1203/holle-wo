@@ -1,6 +1,6 @@
 <template>
-  <div id="login">
-  登录
+  <div id="comment">
+  评论管理
   </div>
 </template>
 
@@ -8,9 +8,9 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
-  name: 'Login'
+  name: 'Comment'
 })
-export default class Login extends Vue {}
+export default class Comment extends Vue {}
 </script>
 
 <style lang="less">

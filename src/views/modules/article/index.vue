@@ -1,6 +1,7 @@
+
 <template>
-  <div id="login">
-  登录
+  <div id="article">
+  发布文章
   </div>
 </template>
 
@@ -8,9 +9,9 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
-  name: 'Login'
+  name: 'Article'
 })
-export default class Login extends Vue {}
+export default class Article extends Vue {}
 </script>
 
 <style lang="less">
