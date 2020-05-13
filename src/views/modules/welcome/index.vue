@@ -1,6 +1,6 @@
 <template>
   <div id="welcome">
-    首页
+    <img src="@/assets/images/login_bg.jpg" alt="欢迎">
   </div>
 </template>
 

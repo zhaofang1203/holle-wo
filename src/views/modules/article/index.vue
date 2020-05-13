@@ -8,27 +8,25 @@
           <el-breadcrumb-item>内容管理</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <el-form label-width="80px" :model="formLabelAlign" label-suffix=":">
+      <el-form label-width="80px" :model="articleFrom" label-suffix=":">
         <el-form-item label="状态">
-          <el-radio-group v-model="radio">
-            <el-radio :label="3">备选项</el-radio>
-            <el-radio :label="6">备选项</el-radio>
-            <el-radio :label="9">备选项</el-radio>
+          <el-radio-group v-model="articleFrom.status" v-for="item in statusList" :key="item.name">
+            <el-radio :label="item.value">{{ item.name }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="formLabelAlign.channel" placeholder="请选择">
+          <el-select v-model="articleFrom.channelid" placeholder="请选择">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in channelsList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="时间">
           <el-date-picker
-            v-model="formLabelAlign.time"
+            v-model="time"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -36,7 +34,7 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">筛选</el-button>
+          <el-button type="primary" @click="search">筛选</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -55,34 +53,74 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { typeList } from '../../index.d'
 
 @Component({
   name: 'Article'
 })
 export default class Article extends Vue {
-  public formLabelAlign = {}
   public radio = 3
+  public time = []
   public tableData = []
-  public options = [
-    { value: '选项1', label: '黄金糕' },
-    {
-      value: '选项2',
-      label: '双皮奶'
-    },
-    {
-      value: '选项3',
-      label: '蚵仔煎'
-    },
-    {
-      value: '选项4',
-      label: '龙须面'
-    },
-    {
-      value: '选项5',
-      label: '北京烤鸭'
-    }
+  public channelsList = []
+  public articleFrom = {
+    status: null, // 否文章状态，0-草稿，1-待审核，2-审核通过，3-审核失败，4-已删除，不传为全部
+    channelid: '', // 否频道id，不传为全部
+    beginpubdate: '', // 否2019-01-01起始时间
+    endpubdate: '', // 否2019-01-02截止时间
+    page: 1, // 否页数
+    perpage: 10, // 否每页数量
+    responsetype: '' // 否返回数据的字段，不传返回用于内容管理的字段，传comment 返回用于评论管理的字段，传statistic 返回用于图文数据的字段
+  }
+
+  /*
+   *jdhfjhv
+   */
+  public statusList: Array<typeList> = [
+    { name: '全部', value: null },
+    { name: '草稿', value: 0 },
+    { name: '待审核', value: 1 },
+    { name: '审核通过', value: 2 },
+    { name: '审核失败', value: 3 },
+    { name: '已删除', value: 4 }
   ]
+
+  @Watch('time')
+  public timeChange (value: []) {
+    console.log(value, 'value')
+    if (value.length > 0) {
+      this.articleFrom.beginpubdate = value[0]
+      this.articleFrom.endpubdate = value[1]
+    }
+  }
+  /*
+   *jdhfjhv
+   */
+
+  public async search () {
+    console.log(this.articleFrom, 'articleFrom')
+    const { data } = await this.$axios.get('/articles', { params: this.articleFrom })
+    console.log(data, 'data')
+  }
+  /*
+   *jdhfjhv
+   */
+
+  public created () {
+    this.getChannels()
+  }
+
+  /*
+   *jdhfjhv
+   */
+
+  public async getChannels () {
+    const { data } = await this.$axios.get('/channels')
+    if (data.message === 'OK') {
+      this.channelsList = data.data.channels
+    }
+  }
 }
 </script>
 
@@ -92,5 +130,8 @@ export default class Article extends Vue {
 }
 .box-search {
   margin-bottom: 20px;
+}
+.el-radio-group {
+  margin-right: 10px;
 }
 </style>
